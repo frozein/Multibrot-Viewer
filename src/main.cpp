@@ -62,7 +62,7 @@ int main()
 
 	//create and init window:
 	//---------------------------------
-	GLFWwindow* window = glfwCreateWindow(screenW, screenH, "Fractal", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(screenW, screenH, "Multibrot Viewer", NULL, NULL);
 	if(window == NULL)
 	{
 		printf("FAILED TO CREATE WINDOW\n");
