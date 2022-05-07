@@ -1,0 +1,75 @@
+#version 430 core
+layout(local_size_x = 16, local_size_y = 16) in;
+layout(rgba32f, binding = 0) uniform image2D img_output;
+
+//parameters:
+uniform float positionX;
+uniform float positionY;
+uniform float scale;
+uniform uint maxIter;
+uniform uint mandelPower;
+uniform vec3 color;
+uniform float rPower, gPower, bPower;
+
+//iterates z once, only works on positive, even powers
+vec2 iterate(vec2 z, vec2 c, uint n)
+{
+    vec2 res;
+    res.x = pow((z.x * z.x + z.y * z.y), (n / 2)) * cos(n * atan(z.y / z.x));
+    res.y = pow((z.x * z.x + z.y * z.y), (n / 2)) * sin(n * atan(z.y / z.x));
+
+    return res + c;
+}
+
+//returns the number of iterations before the point "escaped"
+uint num_iterations(vec2 c, uint maxIterations)
+{
+    const float ESCAPE = 4;
+    vec2 z = vec2(0.0);
+
+    uint curIterations = 0;
+    while(dot(z, z) <= ESCAPE && curIterations < maxIterations)
+    {
+        z = iterate(z, c, mandelPower);
+        curIterations++;
+    }
+
+    return curIterations;
+}
+
+//returns the color of a pixel given how many iterations it took to escape
+vec3 get_color(uint numIterations, uint maxIterations)
+{
+    //set color to black if the pixel is part of the set:
+    if(numIterations == maxIterations)
+        return vec3(0);
+
+    //generate colors based on how close the pixel was to being part of the set:
+    float f = float(numIterations) / float(maxIterations);
+    float r = pow(f, rPower);
+    float g = pow(f, gPower);
+    float b = pow(f, bPower);
+
+    return color * vec3(r, g, b);
+}
+
+void main()
+{
+    const vec2 totalSize = vec2(gl_NumWorkGroups.xy) * vec2(gl_WorkGroupSize.xy); //total number of pixels
+    const vec2 texPos = vec2(gl_GlobalInvocationID.xy); //current pixel position
+    const float aspectRatio = totalSize.y / totalSize.x;
+    const vec2 minPos = vec2(-2, -2 * aspectRatio);
+    const vec2 maxPos = vec2(2, 2 * aspectRatio);
+
+    //calculate coordinates of pixel:
+    vec2 coords = minPos + maxPos * texPos / (totalSize * scale);
+    coords += 0.5 * (maxPos - maxPos / scale);
+    coords += vec2(positionX, positionY);
+
+    //iterate and color:
+    uint numIterations = num_iterations(coords, maxIter);
+    vec3 finalColor = get_color(numIterations, maxIter);
+
+    //store final color:
+    imageStore(img_output, ivec2(texPos), vec4(finalColor.xyz, 1.0));
+}
