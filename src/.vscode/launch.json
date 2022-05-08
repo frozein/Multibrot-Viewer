@@ -8,7 +8,7 @@
 			"name": "cl.exe - Build and debug active file",
 			"type": "cppvsdbg",
 			"request": "launch",
-			"program": "${workspaceFolder}\\..\\bin\\fractal.exe",
+			"program": "${workspaceFolder}\\..\\bin\\multibrot.exe",
 			"args": [],
 			"stopAtEntry": false,
 			"cwd": "${workspaceFolder}\\..\\assets",

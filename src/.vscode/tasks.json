@@ -14,7 +14,7 @@
 				"/EHsc",
 				"/nologo",
 				"/Fe:",
-				"${workspaceFolder}\\..\\bin\\fractal.exe",
+				"${workspaceFolder}\\..\\bin\\multibrot.exe",
 
 				"${workspaceFolder}\\*.c", //source files
 				"${workspaceFolder}\\*.cpp",
