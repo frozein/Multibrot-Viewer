@@ -25,7 +25,7 @@ vec2 iterate(vec2 z, vec2 c, uint n)
 uint num_iterations(vec2 c, uint maxIterations)
 {
     const float ESCAPE = 4;
-    vec2 z = vec2(0.0);
+    vec2 z = c;
 
     uint curIterations = 0;
     while(dot(z, z) <= ESCAPE && curIterations < maxIterations)
